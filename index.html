@@ -421,6 +421,15 @@
       footer { padding: 28px; }
     }
 
+    .form-success {
+      display: none;
+      font-size: 15px;
+      color: var(--accent);
+      margin-top: 16px;
+    }
+    .form-success.visible { display: block; }
+    .join-form.hidden { display: none; }
+
     @media (max-width: 600px) {
       h1 { font-size: 40px; letter-spacing: -2px; }
       nav { padding: 18px 20px; }
@@ -466,11 +475,12 @@
       <p class="hero-sub">
         The definitive community for practitioners navigating answer engine optimization, AI visibility, and the new rules of search.
       </p>
-      <div class="join-form">
+      <div class="join-form" id="hero-form">
         <input type="email" id="hero-email" placeholder="you@company.com" autocomplete="email">
-        <button class="btn-primary">Join Free</button>
+        <button class="btn-primary" id="hero-btn">Join Free</button>
       </div>
-      <p class="hero-meta">Free to join. No pitch. Just practitioners sharing what works.</p>
+      <p class="hero-meta" id="hero-meta">Free to join. No pitch. Just practitioners sharing what works.</p>
+      <p class="form-success" id="hero-success">You're in. Check your email for the Slack invite.</p>
     </div>
   </section>
 
@@ -564,10 +574,11 @@
         <div class="section-label">Join the community</div>
         <h2>Ready to get in?</h2>
         <p>Free to join. No pitch. Just practitioners sharing what's actually working in AI search.</p>
-        <div class="join-form" style="margin: 0 auto 0; max-width: 420px;">
-          <input type="email" placeholder="you@company.com" autocomplete="email">
-          <button class="btn-primary">Join Free</button>
+        <div class="join-form" id="cta-form" style="margin: 0 auto 0; max-width: 420px;">
+          <input type="email" id="cta-email" placeholder="you@company.com" autocomplete="email">
+          <button class="btn-primary" id="cta-btn">Join Free</button>
         </div>
+        <p class="form-success" id="cta-success">You're in. Check your email for the Slack invite.</p>
       </div>
     </div>
   </section>
@@ -579,6 +590,72 @@
     </div>
     <div class="footer-right">© 2026 The AEO Community</div>
   </footer>
+
+
+  <script>
+    const API_KEY = 'B1yv8e7vAOMD4OeavZCtTWcLdTA4GpUJQTiBklZvf1BiUmyCW6LKj5KytyB5mjpD';
+
+    async function subscribe(email, formId, btnId, successId, metaId) {
+      const btn = document.getElementById(btnId);
+      const form = document.getElementById(formId);
+      const success = document.getElementById(successId);
+
+      btn.textContent = 'Joining...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(
+          'https://api.beehiiv.com/v2/publications/ed6425d3-ffa2-4fcb-9405-fb70202cb068/subscriptions',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+              email,
+              reactivate_existing: true,
+              send_welcome_email: true,
+              utm_source: 'website',
+              utm_medium: 'organic'
+            })
+          }
+        );
+
+        if (res.ok) {
+          form.classList.add('hidden');
+          if (metaId) document.getElementById(metaId).style.display = 'none';
+          success.classList.add('visible');
+        } else {
+          btn.textContent = 'Try again';
+          btn.disabled = false;
+        }
+      } catch {
+        btn.textContent = 'Try again';
+        btn.disabled = false;
+      }
+    }
+
+    function handleSubmit(emailId, formId, btnId, successId, metaId) {
+      const email = document.getElementById(emailId).value.trim();
+      if (!email) { document.getElementById(emailId).focus(); return; }
+      subscribe(email, formId, btnId, successId, metaId);
+    }
+
+    document.getElementById('hero-btn').addEventListener('click', () =>
+      handleSubmit('hero-email', 'hero-form', 'hero-btn', 'hero-success', 'hero-meta'));
+
+    document.getElementById('hero-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('hero-btn').click();
+    });
+
+    document.getElementById('cta-btn').addEventListener('click', () =>
+      handleSubmit('cta-email', 'cta-form', 'cta-btn', 'cta-success', null));
+
+    document.getElementById('cta-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('cta-btn').click();
+    });
+  </script>
 
 </body>
 </html>
