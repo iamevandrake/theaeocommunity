@@ -475,15 +475,17 @@
       <p class="hero-sub">
         The definitive community for practitioners navigating answer engine optimization, AI visibility, and the new rules of search.
       </p>
-      <div style="max-width: 400px; margin: 0 auto 12px;">
+      <div class="beehiiv-wrap" style="max-width: 400px; margin: 0 auto 12px;">
         <iframe
+          data-beehiiv
           src="https://subscribe-forms.beehiiv.com/v3/forms/fe6864e9-10cd-462e-83c9-e24a97d5ab55"
           width="100%" height="140"
           frameborder="0" scrolling="no"
           style="border: none; overflow: hidden; display: block;"
         ></iframe>
       </div>
-      <p class="hero-meta">Free to join. No pitch. Just practitioners sharing what works.</p>
+      <p class="beehiiv-success" style="display:none; color: var(--accent); font-size: 15px; margin-bottom: 20px;">You're in. Check your email for the Slack invite.</p>
+      <p class="hero-meta" id="hero-meta-text">Free to join. No pitch. Just practitioners sharing what works.</p>
     </div>
   </section>
 
@@ -577,14 +579,16 @@
         <div class="section-label">Join the community</div>
         <h2>Ready to get in?</h2>
         <p>Free to join. No pitch. Just practitioners sharing what's actually working in AI search.</p>
-        <div style="max-width: 400px; margin: 0 auto;">
+        <div class="beehiiv-wrap" style="max-width: 400px; margin: 0 auto;">
           <iframe
+            data-beehiiv
             src="https://subscribe-forms.beehiiv.com/v3/forms/fe6864e9-10cd-462e-83c9-e24a97d5ab55"
             width="100%" height="140"
             frameborder="0" scrolling="no"
             style="border: none; overflow: hidden; display: block;"
           ></iframe>
         </div>
+        <p class="beehiiv-success" style="display:none; color: var(--accent); font-size: 15px; margin-top: 20px;">You're in. Check your email for the Slack invite.</p>
       </div>
     </div>
   </section>
@@ -600,6 +604,44 @@
 
   <script async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
 
+  <script>
+    window.addEventListener('message', function(e) {
+      if (!e.data || e.origin !== 'https://subscribe-forms.beehiiv.com') return;
+      var d = e.data;
+      var iframes = document.querySelectorAll('iframe[data-beehiiv]');
+
+      // Auto-size the iframe once it reports its real height
+      if (d.type === 'beehiiv:styles' && d.payload && d.payload.height) {
+        for (var i = 0; i < iframes.length; i++) {
+          if (iframes[i].contentWindow === e.source) {
+            iframes[i].style.height = d.payload.height;
+            break;
+          }
+        }
+      }
+
+      // Handshake: tell the iframe the parent is ready so it reports its height
+      if (d.type === 'beehiiv:child-loaded') {
+        for (var j = 0; j < iframes.length; j++) {
+          if (iframes[j].contentWindow === e.source) {
+            iframes[j].style.height = '2000px';
+            iframes[j].contentWindow.postMessage({ type: 'beehiiv:parent-loaded' }, '*');
+            break;
+          }
+        }
+      }
+
+      // Successful submission — swap form for success message
+      if (d.type === 'beehiiv:success-toast') {
+        var wraps = document.querySelectorAll('.beehiiv-wrap');
+        var successes = document.querySelectorAll('.beehiiv-success');
+        for (var k = 0; k < wraps.length; k++) wraps[k].style.display = 'none';
+        for (var l = 0; l < successes.length; l++) successes[l].style.display = 'block';
+        var meta = document.getElementById('hero-meta-text');
+        if (meta) meta.style.display = 'none';
+      }
+    });
+  </script>
 
 </body>
 </html>
