@@ -592,8 +592,10 @@
   </footer>
 
 
+  <script async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
+
   <script>
-    const API_KEY = 'B1yv8e7vAOMD4OeavZCtTWcLdTA4GpUJQTiBklZvf1BiUmyCW6LKj5KytyB5mjpD';
+    const FORM_ID = 'fe6864e9-10cd-462e-83c9-e24a97d5ab55';
 
     async function subscribe(email, formId, btnId, successId, metaId) {
       const btn = document.getElementById(btnId);
@@ -605,20 +607,11 @@
 
       try {
         const res = await fetch(
-          'https://api.beehiiv.com/v2/publications/ed6425d3-ffa2-4fcb-9405-fb70202cb068/subscriptions',
+          `https://subscribe-forms.beehiiv.com/v3/forms/${FORM_ID}/subscribe`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify({
-              email,
-              reactivate_existing: true,
-              send_welcome_email: true,
-              utm_source: 'website',
-              utm_medium: 'organic'
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
           }
         );
 
